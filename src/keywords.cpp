@@ -85,8 +85,21 @@ static chunk_tag_t keywords[] =
    { "API_DEPRECATED_WITH_REPLACEMENT", CT_ATTRIBUTE,        LANG_OC                                                                     },
    { "API_UNAVAILABLE",                 CT_ATTRIBUTE,        LANG_OC                                                                     },
    { "BOOL",                            CT_TYPE,             LANG_OC                                                                     },
+   { "CF_SWIFT_NAME",                   CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "DEPRECATED_ATTRIBUTE",            CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "NS_CLOSED_ENUM",                  CT_ENUM,             LANG_OC                                                                     },
+   { "NS_DESIGNATED_INITIALIZER",       CT_ATTRIBUTE,        LANG_OC                                                                     },
    { "NS_ENUM",                         CT_ENUM,             LANG_OC                                                                     },
+   { "NS_ERROR_ENUM",                   CT_ENUM,             LANG_OC                                                                     },
+   { "NS_FORMAT_FUNCTION",              CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "NS_NOESCAPE",                     CT_ATTRIBUTE,        LANG_OC                                                                     },
    { "NS_OPTIONS",                      CT_ENUM,             LANG_OC                                                                     },
+   { "NS_REFINED_FOR_SWIFT",            CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "NS_SWIFT_NAME",                   CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "NS_SWIFT_NOTHROW",                CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "NS_SWIFT_UNAVAILABLE",            CT_ATTRIBUTE,        LANG_OC                                                                     },
+   { "NS_TYPED_ENUM",                   CT_ENUM,             LANG_OC                                                                     },
+   { "NS_TYPED_EXTENSIBLE_ENUM",        CT_ENUM,             LANG_OC                                                                     },
    { "Q_EMIT",                          CT_Q_EMIT,           LANG_CPP                                                                    }, // guy 2015-10-16
    { "Q_FOREACH",                       CT_FOR,              LANG_CPP                                                                    }, // guy 2015-09-23
    { "Q_FOREVER",                       CT_Q_FOREVER,        LANG_CPP                                                                    }, // guy 2015-10-18

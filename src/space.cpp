@@ -1432,6 +1432,15 @@ static iarf_e do_space(chunk_t *first, chunk_t *second, int &min_sp)
       || chunk_is_token(first, CT_CNG_HASINC)
       || chunk_is_token(first, CT_CNG_HASINCN))
    {
+      if (language_is_set(LANG_OC)) {
+          // FIX: void (NS_NOESCAPE ^) -> void(NS_NOESCAPE ^)
+          if (chunk_get_next_type(second, CT_OC_BLOCK_CARET, 2) != nullptr)
+          {
+              log_rule("IGNORE");
+              return(IARF_IGNORE);
+          }
+      }
+
       if (  (options::sp_func_call_paren_empty() != IARF_IGNORE)
          && chunk_is_token(second, CT_FPAREN_OPEN))
       {
@@ -2333,6 +2342,15 @@ static iarf_e do_space(chunk_t *first, chunk_t *second, int &min_sp)
    if (  chunk_is_token(first, CT_PTR_TYPE)
       && chunk_is_token(second, CT_PAREN_OPEN))
    {
+       if (language_is_set(LANG_OC)) {
+           // FIX: 'NSString *' in 'NSString * (NS_NOESCAPE ^)' not considered as a result of function
+           if (chunk_get_next_type(second, CT_OC_BLOCK_CARET, 2) != nullptr)
+           {
+               log_rule("sp_after_ptr_star_func");
+               return(options::sp_after_ptr_star_func());
+           }
+       }
+
       // Add or remove space after pointer star '*', if followed by a word.
       log_rule("sp_after_ptr_star");
       return(options::sp_after_ptr_star());
@@ -2589,6 +2607,15 @@ static iarf_e do_space(chunk_t *first, chunk_t *second, int &min_sp)
    // If nothing claimed the PTR_TYPE, then return ignore
    if (chunk_is_token(first, CT_PTR_TYPE) || chunk_is_token(second, CT_PTR_TYPE))
    {
+       if (language_is_set(LANG_OC)) {
+           // FIX: 'NSString *' in 'NSString * (^)' not considered as a result of function
+           if (chunk_get_next_type(second, CT_OC_BLOCK_CARET, 2) != nullptr)
+           {
+               log_rule("sp_after_ptr_star_func");
+               return(options::sp_after_ptr_star_func());
+           }
+       }
+
       log_rule("IGNORE");
       return(IARF_IGNORE);
    }
@@ -3046,8 +3073,17 @@ static iarf_e do_space(chunk_t *first, chunk_t *second, int &min_sp)
    // TODO: if necessary create a new option
    if (chunk_is_token(first, CT_LABEL_COLON) && chunk_is_token(second, CT_WORD))
    {
-      log_rule("ADD");
-      return(IARF_ADD);
+       // FIX: NS_SWIFT_NAME(SKFuelKind.string(self:one:two:)) -> NS_SWIFT_NAME(SKFuelKind.string(self:one: two:))
+       if (language_is_set(LANG_OC)) {
+           if (chunk_get_prev_type(first, CT_ATTRIBUTE, 1) != nullptr)
+           {
+               log_rule("IGNORE");
+               return(IARF_IGNORE);
+           }
+       }
+
+       log_rule("ADD");
+       return(IARF_ADD);
    }
 
    // TODO: if necessary create a new option
@@ -3364,6 +3400,23 @@ static iarf_e do_space(chunk_t *first, chunk_t *second, int &min_sp)
       log_rule("ADD");
       return(IARF_ADD);
    }
+
+    if (language_is_set(LANG_OC))
+    {
+        // FIX: NS_SWIFT_NAME(SKFuelKind.string(self:one:)) -> NS_SWIFT_NAME(SKFuelKind.string(self: one: ))
+        if (chunk_get_prev_type(first, CT_ATTRIBUTE, 1) != nullptr)
+        {
+            log_rule("IGNORE");
+            return(IARF_IGNORE);
+        }
+
+        // FIX: typedef NS_ENUM(NSUInteger, XXX) -> typedef NS_ENUM (NSUInteger, XXX)
+        if (chunk_is_token(first, CT_ENUM) && chunk_is_paren_open(second))
+        {
+           log_rule("IGNORE");
+           return(IARF_IGNORE);
+        }
+    }
    //
    // these lines are only useful for debugging uncrustify itself
    D_LOG_FMT(LSPACE, "\n\n%s(%d): WARNING: unrecognize do_space:\n",
