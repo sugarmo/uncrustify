@@ -147,6 +147,16 @@ static int compare_chunks(chunk_t *pc1, chunk_t *pc2, bool tcare)
               __func__, __LINE__, pc2->text(), pc2->len(), pc2->orig_line, pc2->orig_col);
       auto const &s1     = chunk_sort_str(pc1);
       auto const &s2     = chunk_sort_str(pc2);
+
+       if (s1.startswith("<") && s2.startswith("\""))
+       {
+           return(-1);
+       }
+       else if (s1.startswith("\"") && s2.startswith("<"))
+       {
+           return(1);
+       }
+
       int        ret_val = unc_text::compare(s1, s2, std::min(s1.size(), s2.size()), tcare);
       LOG_FMT(LSORT, "%s(%d): ret_val is %d\n",
               __func__, __LINE__, ret_val);
