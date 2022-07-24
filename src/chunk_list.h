@@ -305,6 +305,24 @@ chunk_t *chunk_get_prev_ncnlni(chunk_t *cur, scope_e scope = scope_e::ALL);
 
 
 /**
+ * Gets the prev non-NEWLINE and non-comment and non-ignored nad non-attribute chunk
+ *
+ * @param cur    chunk to use as start point
+ * @param scope  code region to search in
+ */
+chunk_t *chunk_get_prev_ncnlnina(chunk_t *cur, scope_e scope = scope_e::ALL);
+
+
+/**
+ * Gets the next non-NEWLINE and non-comment and non-ignored nad non-attribute chunk
+ *
+ * @param cur    chunk to use as start point
+ * @param scope  code region to search in
+ */
+chunk_t *chunk_get_next_ncnlnina(chunk_t *cur, scope_e scope = scope_e::ALL);
+
+
+/**
  * Gets the prev non-NEWLINE and non-comment chunk, non-preprocessor chunk
  *
  * @param cur    chunk to use as start point
@@ -599,6 +617,10 @@ static inline bool chunk_is_comment_or_newline_or_ignored(chunk_t *pc)
    return(chunk_is_comment(pc) || chunk_is_newline(pc) || chunk_is_token(pc, CT_IGNORED));
 }
 
+static inline bool chunk_is_comment_or_newline_or_ignored_or_attribute(chunk_t *pc)
+{
+   return(chunk_is_comment(pc) || chunk_is_newline(pc) || chunk_is_token(pc, CT_IGNORED) || chunk_is_token(pc, CT_ATTRIBUTE));
+}
 
 static inline bool chunk_is_balanced_square(chunk_t *pc)
 {

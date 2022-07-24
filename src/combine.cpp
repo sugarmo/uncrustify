@@ -1161,7 +1161,8 @@ void do_symbol_check(chunk_t *prev, chunk_t *pc, chunk_t *next)
     */
    if (chunk_is_token(next, CT_PAREN_OPEN))
    {
-      tmp = chunk_get_next_ncnl(next);
+      // FIX: (NS_NOESCAPE ^) is not considered as a block
+      tmp = chunk_get_next_ncnlnina(next);
 
       if ((language_is_set(LANG_C | LANG_CPP | LANG_OC)) && chunk_is_token(tmp, CT_CARET))
       {
@@ -2195,9 +2196,9 @@ void fix_symbols(void)
       {
          chunk_t *next = chunk_get_next_ncnl(pc, scope_e::PREPROC);
 
-         if (next != nullptr && chunk_is_token(next, CT_PAREN_OPEN))
+         if (next != nullptr && chunk_is_paren_open(next))
          {
-            flag_parens(next, PCF_NONE, CT_FPAREN_OPEN, CT_ATTRIBUTE, false);
+            flag_parens(next, PCF_NONE, next->type, CT_ATTRIBUTE, true);
          }
       }
    }
@@ -6430,7 +6431,7 @@ static void handle_oc_block_type(chunk_t *pc)
       return;
    }
    // make sure we have '( ^'
-   chunk_t *tpo = chunk_get_prev_ncnlni(pc); // type paren open   Issue #2279
+   chunk_t *tpo = chunk_get_prev_ncnlnina(pc); // type paren open   Issue #2279
 
    if (chunk_is_paren_open(tpo))
    {
@@ -6438,10 +6439,10 @@ static void handle_oc_block_type(chunk_t *pc)
        * block type: 'RTYPE (^LABEL)(ARGS)'
        * LABEL is optional.
        */
-      chunk_t *tpc = chunk_skip_to_match(tpo);   // type close paren (after '^')
-      chunk_t *nam = chunk_get_prev_ncnlni(tpc); // name (if any) or '^'   Issue #2279
-      chunk_t *apo = chunk_get_next_ncnl(tpc);   // arg open paren
-      chunk_t *apc = chunk_skip_to_match(apo);   // arg close paren
+      chunk_t *tpc = chunk_skip_to_match(tpo);     // type close paren (after '^')
+      chunk_t *nam = chunk_get_prev_ncnlnina(tpc); // name (if any) or '^'   Issue #2279
+      chunk_t *apo = chunk_get_next_ncnl(tpc);     // arg open paren
+      chunk_t *apc = chunk_skip_to_match(apo);     // arg close paren
 
       /*
        * If this is a block literal instead of a block type, 'nam'
@@ -6487,7 +6488,7 @@ static void handle_oc_block_type(chunk_t *pc)
          set_chunk_type(apc, CT_FPAREN_CLOSE);
          set_chunk_parent(apc, CT_FUNC_PROTO);
          fix_fcn_def_params(apo);
-         mark_function_return_type(nam, chunk_get_prev_ncnlni(tpo), pt);   // Issue #2279
+         mark_function_return_type(nam, chunk_get_prev_ncnlnina(tpo), pt);   // Issue #2279
       }
    }
 } // handle_oc_block_type
